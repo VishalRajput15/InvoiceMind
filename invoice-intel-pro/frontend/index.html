@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>NexDoc AI | AI Invoice Assistant</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            background: radial-gradient(circle at top right, #1E293B, #0F172A);
+            background-attachment: fixed;
+        }
+
+        .indigo-glow {
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0F172A;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body class="text-slate-200 min-h-screen flex flex-col font-sans antialiased">
+
+    <!-- Header -->
+    <header class="bg-[#0F172A]/80 backdrop-blur-xl border-b border-white/5 text-white z-20 px-8 py-4 flex justify-between items-center sticky top-0 shrink-0">
+
+        <div class="text-xl font-black tracking-widest uppercase">
+            NexDoc<span class="text-indigo-400">AI</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+
+            <span class="text-[9px] font-bold tracking-[0.2em] text-indigo-300 uppercase">
+                AI Assistant Active
+            </span>
+        </div>
+
+    </header>
+
+    <main class="flex-1 flex flex-col items-center p-6 space-y-8">
+
+        <!-- Hero -->
+        <section class="max-w-3xl w-full text-center space-y-2 shrink-0">
+
+            <h1 class="text-4xl font-black text-white tracking-tighter">
+                Smart <span class="text-indigo-400">Invoice Assistant.</span>
+            </h1>
+
+            <p class="text-slate-400 text-sm font-light max-w-xl mx-auto">
+                Advanced AI-powered invoice extraction with structured Excel reporting.
+            </p>
+
+        </section>
+
+        <!-- Upload -->
+        <section class="max-w-3xl w-full shrink-0">
+
+            <div
+                class="glass-panel p-6 md:p-10 rounded-[1.5rem] flex flex-col items-center justify-center space-y-4 transition-all hover:border-indigo-500/40 group"
+                id="drop-zone">
+
+                <div
+                    class="w-12 h-12 bg-indigo-600/10 border border-indigo-500/30 rounded-2xl flex items-center justify-center text-indigo-400 shadow-inner group-hover:scale-110 transition-transform">
+                    📄
+                </div>
+
+                <div class="text-center">
+
+                    <h2 class="text-lg font-bold text-white tracking-tight">
+                        Upload Invoices
+                    </h2>
+
+                    <p class="text-slate-500 text-xs mt-1">
+                        Select multiple PDF/Image files to begin.
+                    </p>
+
+                </div>
+
+                <!-- FILE INPUT -->
+                <input
+                    type="file"
+                    id="fileInput"
+                    class="hidden"
+                    multiple
+                    accept=".pdf,.png,.jpg,.jpeg,.bmp,.tiff"
+                />
+
+                <!-- BUTTON -->
+                <button
+                    onclick="document.getElementById('fileInput').click()"
+                    class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-2.5 rounded-lg transition-all shadow-lg font-bold text-[10px] tracking-[0.2em] uppercase">
+
+                    Browse Files
+
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- Queue -->
+        <section id="queue-container" class="hidden max-w-3xl w-full pb-10">
+
+            <div class="glass-panel p-6 rounded-[1.5rem] flex flex-col">
+
+                <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+
+                    <h2 class="font-black text-indigo-300 text-[9px] uppercase tracking-[0.4em]">
+                        Document Queue
+                    </h2>
+
+                    <span
+                        id="file-count"
+                        class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">
+                    </span>
+
+                </div>
+
+                <ul id="file-list" class="space-y-3 mb-6"></ul>
+
+                <!-- Progress -->
+                <div
+                    id="progress-wrapper"
+                    class="hidden space-y-4 mb-6 bg-black/20 p-6 rounded-xl border border-white/5">
+
+                    <div class="flex justify-between text-[8px] font-black uppercase tracking-[0.3em]">
+
+                        <span id="progress-status" class="text-indigo-300">
+                            Processing...
+                        </span>
+
+                        <span id="progress-percent" class="text-indigo-400">
+                            0%
+                        </span>
+
+                    </div>
+
+                    <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+
+                        <div
+                            id="progress-bar"
+                            class="bg-indigo-500 h-full rounded-full transition-all duration-300 indigo-glow"
+                            style="width:0%">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Buttons -->
+                <div class="space-y-3">
+
+                    <button
+                        id="processBtn"
+                        class="w-full bg-indigo-600/10 border border-indigo-500/40 text-indigo-300 font-bold py-4 rounded-xl hover:bg-indigo-600 hover:text-white transition-all disabled:opacity-20 uppercase text-[10px] tracking-[0.4em]"
+                        disabled>
+
+                        Start Data Extraction
+
+                    </button>
+
+                    <a
+                        id="downloadBtn"
+                        class="hidden w-full bg-white text-[#0F172A] font-black py-4 rounded-xl hover:bg-slate-200 transition-all shadow-2xl flex items-center justify-center gap-3 text-[10px] uppercase tracking-[0.2em]">
+
+                        📂 Download Final Report
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center text-slate-600 text-[10px] font-bold uppercase tracking-[0.5em]">
+
+        © 2026 NexDoc AI Systems
+
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+
+        const fileInput = document.getElementById('fileInput');
+
+        const fileList = document.getElementById('file-list');
+
+        const queueContainer = document.getElementById('queue-container');
+
+        const processBtn = document.getElementById('processBtn');
+
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        const progressWrapper = document.getElementById('progress-wrapper');
+
+        const progressBar = document.getElementById('progress-bar');
+
+        const progressPercent = document.getElementById('progress-percent');
+
+        const progressStatus = document.getElementById('progress-status');
+
+        const fileCount = document.getElementById('file-count');
+
+
+        // FILE SELECTION
+
+        fileInput.addEventListener('change', () => {
+
+            fileList.innerHTML = "";
+
+            downloadBtn.classList.add('hidden');
+
+            const files = fileInput.files;
+
+            if (files.length > 0) {
+
+                queueContainer.classList.remove('hidden');
+
+                fileCount.innerText = `${files.length} FILES`;
+
+                Array.from(files).forEach((file) => {
+
+                    const li = document.createElement('li');
+
+                    li.className =
+                        "flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 text-[11px]";
+
+                    li.innerHTML = `
+                        <span class="flex items-center gap-3 font-semibold text-slate-300 truncate pr-2">
+                            📄 ${file.name}
+                        </span>
+
+                        <span class="text-[8px] font-black text-indigo-400 uppercase bg-indigo-500/10 px-2 py-1 rounded shrink-0">
+                            Ready
+                        </span>
+                    `;
+
+                    fileList.appendChild(li);
+
+                });
+
+                processBtn.disabled = false;
+            }
+        });
+
+
+        // PROCESS BUTTON
+
+        processBtn.onclick = async (event) => {
+
+            processBtn.disabled = true;
+
+            processBtn.innerText = "PROCESSING...";
+
+            progressWrapper.classList.remove('hidden');
+
+            progressBar.style.width = "0%";
+
+            progressPercent.innerText = "0%";
+
+            progressStatus.innerText = "UPLOADING FILES";
+
+            const files = fileInput.files;
+
+            const totalFiles = files.length;
+
+            const formData = new FormData();
+
+            // ADD ALL FILES
+            for (let i = 0; i < totalFiles; i++) {
+
+                formData.append("files", files[i]);
+            }
+
+            // FAKE LIVE PROGRESS
+            let progress = 0;
+
+            const interval = setInterval(() => {
+
+                if (progress < 90) {
+
+                    progress += 2;
+
+                    progressBar.style.width = progress + "%";
+
+                    progressPercent.innerText = progress + "%";
+                }
+
+            }, 500);
+
+            try {
+
+                const response = await fetch(
+                    "http://127.0.0.1:8000/api/extract",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+                const data = await response.json();
+
+                clearInterval(interval);
+
+                progressBar.style.width = "100%";
+
+                progressPercent.innerText = "100%";
+
+                progressStatus.innerText =
+                    `${data.total_files} FILES PROCESSED`;
+
+                downloadBtn.href =
+                    `http://127.0.0.1:8000/api/download/${data.excel_file}`;
+
+                downloadBtn.classList.remove('hidden');
+
+                processBtn.innerText = "SUCCESSFUL";
+                
+                    event.preventDefault();
+            } catch (err) {
+
+                console.error(err);
+
+                clearInterval(interval);
+
+                progressStatus.innerText = "ERROR";
+
+                processBtn.innerText = "TRY AGAIN";
+
+                processBtn.disabled = false;
+            }
+        };
+
+    </script>
+
+</body>
+
+</html>
